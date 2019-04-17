@@ -82,7 +82,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                     String dataIndex;
                     if (builder.mediaType == TedBottomSheetDialogFragment.BaseBuilder.MediaType.IMAGE) {
                         dataIndex = MediaStore.Images.Media.DATA;
-                    }else{
+                    } else {
                         dataIndex = MediaStore.Video.VideoColumns.DATA;
                     }
                     String imageLocation = cursor.getString(cursor.getColumnIndex(dataIndex));

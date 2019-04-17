@@ -31,6 +31,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -53,9 +54,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import gun0912.tedbottompicker.adapter.GalleryAdapter;
-import gun0912.tedbottompicker.util.RealPathUtil;
 
 public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
@@ -77,14 +78,11 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
     private RecyclerView rc_gallery;
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
 
-
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 dismissAllowingStateLoss();
             }
-
-
         }
 
         @Override
@@ -121,7 +119,6 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
         ft.commitAllowingStateLoss();
     }
 
-
     @Override
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
@@ -135,7 +132,6 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
             if (builder != null && builder.peekHeight > 0) {
                 ((BottomSheetBehavior) behavior).setPeekHeight(builder.peekHeight);
             }
-
         }
 
         initView(contentView);
@@ -145,7 +141,6 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
         setSelectionView();
 
         selectedUriList = new ArrayList<>();
-
 
         if (builder.onImageSelectedListener != null && cameraImageUri != null) {
             addUri(cameraImageUri);
@@ -164,12 +159,9 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
         if (builder.emptySelectionText != null) {
             selected_photos_empty.setText(builder.emptySelectionText);
         }
-
-
     }
 
     private void setDoneButton() {
-
         if (builder.completeButtonText != null) {
             btn_done.setText(builder.completeButtonText);
         }
@@ -191,7 +183,6 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
             return;
         }
 
-
         builder.onMultiImageSelectedListener.onImagesSelected(selectedUriList);
         dismissAllowingStateLoss();
     }
@@ -201,11 +192,9 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
             btn_done.setVisibility(View.GONE);
             selected_photos_container_frame.setVisibility(View.GONE);
         }
-
     }
 
     private void initView(View contentView) {
-
         view_title_container = contentView.findViewById(R.id.view_title_container);
         rc_gallery = contentView.findViewById(R.id.rc_gallery);
         tv_title = contentView.findViewById(R.id.tv_title);
@@ -217,7 +206,6 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
     }
 
     private void setRecyclerView() {
-
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3);
         rc_gallery.setLayoutManager(gridLayoutManager);
         rc_gallery.addItemDecoration(new GridSpacingItemDecoration(gridLayoutManager.getSpanCount(), builder.spacing, builder.includeEdgeSpacing));
@@ -244,13 +232,10 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
                     if (pickerTile.getImageUri() != null) {
                         complete(pickerTile.getImageUri());
                     }
-
                     break;
-
                 default:
                     errorMessage();
             }
-
         });
     }
 
@@ -261,12 +246,10 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
             } else {
                 addUri(uri);
             }
-
         } else {
             builder.onImageSelectedListener.onImageSelected(uri);
             dismissAllowingStateLoss();
         }
-
     }
 
     private void addUri(final Uri uri) {
@@ -282,7 +265,6 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
             return;
         }
 
-
         selectedUriList.add(uri);
 
         final View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.tedbottompicker_selected_item, null);
@@ -291,7 +273,6 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
         rootView.setTag(uri);
 
         selected_photos_container.addView(rootView, 0);
-
 
         int px = (int) getResources().getDimension(R.dimen.tedbottompicker_selected_image_height);
         thumbnail.setLayoutParams(new FrameLayout.LayoutParams(px, px));
@@ -349,18 +330,18 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
     }
 
     private void startCameraIntent() {
-        Intent cameraInent;
+        Intent cameraIntent;
         File mediaFile;
 
         if (builder.mediaType == BaseBuilder.MediaType.IMAGE) {
-            cameraInent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             mediaFile = getImageFile();
         } else {
-            cameraInent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+            cameraIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
             mediaFile = getVideoFile();
         }
 
-        if (cameraInent.resolveActivity(getActivity().getPackageManager()) == null) {
+        if (cameraIntent.resolveActivity(getActivity().getPackageManager()) == null) {
             errorMessage("This Application do not have Camera Application");
             return;
         }
@@ -368,16 +349,16 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
         Uri photoURI = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", mediaFile);
 
-        List<ResolveInfo> resolvedIntentActivities = getContext().getPackageManager().queryIntentActivities(cameraInent, PackageManager.MATCH_DEFAULT_ONLY);
+        List<ResolveInfo> resolvedIntentActivities = getContext().getPackageManager().queryIntentActivities(cameraIntent, PackageManager.MATCH_DEFAULT_ONLY);
         for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
             String packageName = resolvedIntentInfo.activityInfo.packageName;
             getContext().grantUriPermission(packageName, photoURI, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }
 
-        cameraInent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 
         TedOnActivityResult.with(getActivity())
-                .setIntent(cameraInent)
+                .setIntent(cameraIntent)
                 .setListener((resultCode, data) -> {
                     if (resultCode == Activity.RESULT_OK) {
                         onActivityResultCamera(cameraImageUri);
@@ -522,7 +503,6 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
         });
     }
 
-
     private void onActivityResultGallery(Intent data) {
         Uri temp = data.getData();
 
@@ -530,14 +510,17 @@ public class TedBottomSheetDialogFragment extends BottomSheetDialogFragment {
             errorMessage();
         }
 
-        String realPath = RealPathUtil.getRealPath(getActivity(), temp);
+        Uri selectedImageUri = temp;
 
-        Uri selectedImageUri;
-        try {
-            selectedImageUri = Uri.fromFile(new File(realPath));
-        } catch (Exception ex) {
-            selectedImageUri = Uri.parse(realPath);
+        if (temp != null) {
+            try {
+                selectedImageUri = Uri.fromFile(new File(Objects.requireNonNull(temp.toString())));
+            } catch (Exception ex) {
+                Log.e(getClass().getSimpleName(), "Error parsing Uri", ex);
+            }
         }
+
+        Log.i(getClass().getSimpleName(), selectedImageUri.toString());
 
         complete(selectedImageUri);
     }

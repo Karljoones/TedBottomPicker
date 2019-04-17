@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gun0912.tedbottompicker.TedBottomPicker;
-import gun0912.tedbottompicker.TedRxBottomPicker;
 import io.reactivex.disposables.Disposable;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     private Disposable singleImageDisposable;
     private Disposable multiImageDisposable;
     private ViewGroup mSelectedImagesContainer;
-    private RequestManager requestManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,22 +41,16 @@ public class MainActivity extends AppCompatActivity {
 
         iv_image = findViewById(R.id.iv_image);
         mSelectedImagesContainer = findViewById(R.id.selected_photos_container);
-        requestManager = Glide.with(this);
         setSingleShowButton();
         setMultiShowButton();
-        setRxSingleShowButton();
-        setRxMultiShowButton();
-
     }
 
     private void setSingleShowButton() {
-
         Button btnSingleShow = findViewById(R.id.btn_single_show);
         btnSingleShow.setOnClickListener(view -> {
             PermissionListener permissionlistener = new PermissionListener() {
                 @Override
                 public void onPermissionGranted() {
-
                     TedBottomPicker.with(MainActivity.this)
                             //.setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
                             .setSelectedUri(selectedUri)
@@ -73,20 +64,17 @@ public class MainActivity extends AppCompatActivity {
                                 iv_image.setVisibility(View.VISIBLE);
                                 mSelectedImagesContainer.setVisibility(View.GONE);
 
-                                requestManager
+                                Glide.with(getApplicationContext())
                                         .load(uri)
+                                        .apply(new RequestOptions().fitCenter())
                                         .into(iv_image);
                             });
-
-
                 }
 
                 @Override
                 public void onPermissionDenied(ArrayList<String> deniedPermissions) {
                     Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
                 }
-
-
             };
 
             checkPermission(permissionlistener);
@@ -94,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setMultiShowButton() {
-
         Button btnMultiShow = findViewById(R.id.btn_multi_show);
         btnMultiShow.setOnClickListener(view -> {
 
@@ -113,101 +100,16 @@ public class MainActivity extends AppCompatActivity {
                                 selectedUriList = uriList;
                                 showUriList(uriList);
                             });
-
-
                 }
 
                 @Override
                 public void onPermissionDenied(ArrayList<String> deniedPermissions) {
                     Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
                 }
-
-
-            };
-
-            checkPermission(permissionlistener);
-
-        });
-
-    }
-
-
-    private void setRxSingleShowButton() {
-
-        Button btnSingleShow = findViewById(R.id.btn_rx_single_show);
-        btnSingleShow.setOnClickListener(view -> {
-            PermissionListener permissionlistener = new PermissionListener() {
-                @Override
-                public void onPermissionGranted() {
-
-                    singleImageDisposable = TedRxBottomPicker.with(MainActivity.this)
-                            //.setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
-                            .setSelectedUri(selectedUri)
-                            //.showVideoMedia()
-                            .setPeekHeight(1200)
-                            .show()
-                            .subscribe(uri -> {
-                                selectedUri = uri;
-
-                                iv_image.setVisibility(View.VISIBLE);
-                                mSelectedImagesContainer.setVisibility(View.GONE);
-
-                                requestManager
-                                        .load(uri)
-                                        .into(iv_image);
-                            }, Throwable::printStackTrace);
-
-
-                }
-
-                @Override
-                public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                    Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
-                }
-
-
             };
 
             checkPermission(permissionlistener);
         });
-    }
-
-
-    private void setRxMultiShowButton() {
-
-        Button btnRxMultiShow = findViewById(R.id.btn_rx_multi_show);
-        btnRxMultiShow.setOnClickListener(view -> {
-            PermissionListener permissionlistener = new PermissionListener() {
-                @Override
-                public void onPermissionGranted() {
-
-                    multiImageDisposable = TedRxBottomPicker.with(MainActivity.this)
-                            //.setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
-                            .setPeekHeight(1600)
-                            .showTitle(false)
-                            .setCompleteButtonText("Done")
-                            .setEmptySelectionText("No Select")
-                            .setSelectedUriList(selectedUriList)
-                            .showMultiImage()
-                            .subscribe(uris -> {
-                                selectedUriList = uris;
-                                showUriList(uris);
-                            }, Throwable::printStackTrace);
-
-
-                }
-
-                @Override
-                public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                    Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
-                }
-
-
-            };
-
-            checkPermission(permissionlistener);
-        });
-
     }
 
     private void checkPermission(PermissionListener permissionlistener) {
@@ -229,13 +131,11 @@ public class MainActivity extends AppCompatActivity {
         int widthPixel = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
         int heightPixel = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
 
-
         for (Uri uri : uriList) {
-
             View imageHolder = LayoutInflater.from(this).inflate(R.layout.image_item, null);
             ImageView thumbnail = imageHolder.findViewById(R.id.media_image);
 
-            requestManager
+            Glide.with(getApplicationContext())
                     .load(uri.toString())
                     .apply(new RequestOptions().fitCenter())
                     .into(thumbnail);
@@ -243,9 +143,7 @@ public class MainActivity extends AppCompatActivity {
             mSelectedImagesContainer.addView(imageHolder);
 
             thumbnail.setLayoutParams(new FrameLayout.LayoutParams(widthPixel, heightPixel));
-
         }
-
     }
 
     @Override
