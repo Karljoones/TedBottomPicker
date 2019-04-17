@@ -25,7 +25,6 @@ public class TedEmptyRecyclerView extends RecyclerView {
 
 	void checkIfEmpty() {
 		if (emptyView != null) {
-			
 			emptyView.setVisibility(getAdapter().getItemCount() > 0 ? GONE : VISIBLE);
 		}
 	}
@@ -38,8 +37,6 @@ public class TedEmptyRecyclerView extends RecyclerView {
 			checkIfEmpty();
 		}
 	};
-	
-	
 	
 	@Override
 	public void setAdapter(@Nullable Adapter adapter) {

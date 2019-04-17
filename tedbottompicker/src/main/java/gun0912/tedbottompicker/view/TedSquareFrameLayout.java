@@ -36,8 +36,6 @@ public class TedSquareFrameLayout extends FrameLayout {
         }
     }
 
-
-
     //Squares the thumbnail
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec){
@@ -57,6 +55,5 @@ public class TedSquareFrameLayout extends FrameLayout {
         } else if(mMatchWidthToHeight){
             super.onSizeChanged(h, h,oldw,oldh);
         }
-
     }
 }
